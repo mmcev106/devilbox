@@ -1,0 +1,9 @@
+# IMPORTANT: The version must match the version of docker-compose.yml
+---
+version: '2.3'
+
+services:
+  php:
+    restart: always
+  httpd:
+    restart: always
