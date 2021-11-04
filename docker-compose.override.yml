@@ -5,5 +5,10 @@ version: '2.3'
 services:
   php:
     restart: always
+    extra_hosts:  
+      # Older versions of Docker Desktop may add host.docker.internal to your hosts file.
+      # Such an entry should be removed, or it will conflict with this.
+      # If you're having problems, using some othe hostname like host.docker.internal2 may help clarify the issue.
+      host.docker.internal: host-gateway
   httpd:
     restart: always
