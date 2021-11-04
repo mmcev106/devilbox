@@ -161,7 +161,11 @@ services:
     extra_hosts:
       docker.for.lin.host.internal: 172.16.238.1
       docker.for.lin.localhost: 172.16.238.1
-      host.docker.internal2: host-gateway
+
+      # Older versions of Docker Desktop may add host.docker.internal to your hosts file.
+      # Such an entry should be removed, or it will conflict with this.
+      # If you're having problems, using some othe hostname like host.docker.internal2 may help clarify the issue.
+      host.docker.internal: host-gateway
 
     networks:
       app_net:
