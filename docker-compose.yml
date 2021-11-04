@@ -320,7 +320,6 @@ services:
   # MySQL Database
   # ------------------------------------------------------------
   mysql:
-    profiles: ["disabled"]
     image: devilbox/mysql:${MYSQL_SERVER}-0.7
     hostname: mysql
 
@@ -358,7 +357,6 @@ services:
   # PostgreSQL
   # ------------------------------------------------------------
   pgsql:
-    profiles: ["disabled"]
     image: postgres:${PGSQL_SERVER}
     hostname: pgsql
 
@@ -394,7 +392,6 @@ services:
   # Redis
   # ------------------------------------------------------------
   redis:
-    profiles: ["disabled"]
     image: redis:${REDIS_SERVER}
     hostname: redis
 
@@ -421,7 +418,6 @@ services:
   # Memcached
   # ------------------------------------------------------------
   memcd:
-    profiles: ["disabled"]
     image: memcached:${MEMCD_SERVER}
     hostname: memcd
 
@@ -443,7 +439,6 @@ services:
   # MongoDB
   # ------------------------------------------------------------
   mongo:
-    profiles: ["disabled"]
     image: mongo:${MONGO_SERVER}
     hostname: mongo
 

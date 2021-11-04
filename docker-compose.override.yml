@@ -12,3 +12,13 @@ services:
       host.docker.internal: host-gateway
   httpd:
     restart: always
+  mysql:
+    profiles: ["disabled"]
+  pgsql:
+    profiles: ["disabled"]
+  redis:
+    profiles: ["disabled"]
+  memcd:
+    profiles: ["disabled"]
+  mongo:
+    profiles: ["disabled"]
