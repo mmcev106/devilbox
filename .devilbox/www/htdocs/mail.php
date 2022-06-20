@@ -5,10 +5,10 @@
 //
 // $_POST submit for sending a test email
 //
-if (isset($_GET['email']) && isset($_GET['subject']) && isset($_GET['message'])) {
-	$mail = $_GET['email'];
-	$subj = $_GET['subject'];
-	$mess = $_GET['message'];
+if (isset($_POST['email']) && isset($_POST['subject']) && isset($_POST['message'])) {
+	$mail = $_POST['email'];
+	$subj = $_POST['subject'];
+	$mess = $_POST['message'];
 	if (! mail($mail, $subj, $mess)) {
 		loadClass('Logger')->error('Could not send mail to: '.$mail.' | subject: '.$subj);
 	}
@@ -24,6 +24,28 @@ require $VEN_DIR . DIRECTORY_SEPARATOR . 'Mail' . DIRECTORY_SEPARATOR .'mimeDeco
 require $LIB_DIR . DIRECTORY_SEPARATOR . 'Mail.php';
 require $LIB_DIR . DIRECTORY_SEPARATOR . 'Sort.php';
 
+if (isset($_GET['get-body']) && is_numeric($_GET['get-body'])) {
+	$messageNumber = $_GET['get-body'];
+	$MyMbox = new \devilbox\Mail('/var/mail/devilbox');
+	$message = $MyMbox->getMessage($messageNumber-1);
+	$structure = $message['decoded'];
+
+	$body = null;
+	if (isset($structure->body)) {
+		$body = $structure->body;
+	}
+	elseif(isset($structure->parts[1]->body)) {
+		$body = $structure->parts[1]->body;
+	}
+	elseif(isset($structure->parts[0]->body)) {
+		$body = $structure->parts[0]->body;
+	}
+
+	exit(json_encode([
+		'raw' => htmlentities($message['raw']),
+		'body' => $body,
+	]));
+}
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 	$message = $_GET['delete'];
@@ -119,7 +141,7 @@ $messages = $MyMbox->get($sortOrderArr);
 			<div class="row">
 				<div class="col-md-12">
 
-					<form class="form-inline">
+					<form method="post" class="form-inline">
 						<div class="form-group">
 							<label class="sr-only" for="exampleInputEmail1">Email to</label>
 							<input name="email" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter to email">
@@ -132,7 +154,7 @@ $messages = $MyMbox->get($sortOrderArr);
 
 						<div class="form-group">
 							<label class="sr-only" for="exampleInputEmail3">Message</label>
-							<input name="message" type="text" class="form-control" id="exampleInputEmail3" placeholder="Message">
+							<textarea name="message" rows="1" class="form-control" id="exampleInputEmail3" placeholder="Message"></textarea>
 						</div>
 
 						<button type="submit" class="btn btn-primary">Send Email</button>
@@ -171,17 +193,6 @@ $messages = $MyMbox->get($sortOrderArr);
 								<?php
 									$message = htmlentities($data['raw']);
 									$structure = $data['decoded'];
-									$body = null;
-
-									if (isset($structure->body)) {
-										$body = $structure->body;
-									}
-									elseif(isset($structure->parts[1]->body)) {
-										$body = $structure->parts[1]->body;
-									}
-									elseif(isset($structure->parts[0]->body)) {
-										$body = $structure->parts[0]->body;
-									}
 								 ?>
 								<tr id="<?php echo $data['num'];?>" class="subject">
 									<td><?php echo $data['num'];?></td>
@@ -198,17 +209,13 @@ $messages = $MyMbox->get($sortOrderArr);
 								<tr id="mail-<?php echo $data['num'];?>" style="display:none">
 									<td></td>
 									<td colspan="5">
-										<?php if ($body !== null): ?>
-											<template id="mail-body-<?=$data['num']?>"><?=$body?></template>
-											<html-email data-template-id="mail-body-<?=$data['num']?>"></html-email>
-										<?php else: ?>
-											<div class="alert alert-warning" role="alert">
-												No valid body found
-											</div>
-										<?php endif; ?>
+										<div class="email-body"></div>
+										<div class="alert alert-warning" role="alert" style="display:none">
+											No valid body found
+										</div>
 										<hr>
 										<p><a class="btn btn-primary" data-toggle="collapse" href="#email-<?php echo $data['num'];?>" aria-expanded="false" aria-controls="email-<?php echo $data['num'];?>">Raw source</a></p>
-										<div class="collapse" id="email-<?php echo $data['num'];?>"><pre><?php echo $message;?></pre></div>
+										<div class="collapse" id="email-<?php echo $data['num'];?>"><pre class="raw-email-body"></pre></div>
 									</td>
 								</tr>
 							<?php endforeach; ?>
@@ -227,12 +234,34 @@ $messages = $MyMbox->get($sortOrderArr);
 		<script>
 		$(function() {
 			$('.subject').click(function() {
-				var id = ($(this).attr('id'));
-				$('#mail-'+id).toggle();
+				const id = ($(this).attr('id'));
+				const row = $('#mail-'+id);
+				row.toggle();
+
+				const bodyElement = row.find('.email-body')[0];
+				if(bodyElement.shadowRoot !== null){
+					// We've already fetched the message content.
+					return;
+				}
+
+				bodyElement.attachShadow({ mode: 'open' });
+				bodyElement.shadowRoot.innerHTML = 'Loading...';
+
+				$.get('?get-body=' + id, function(response){
+					response = JSON.parse(response);
+					row.find('.raw-email-body').html(response.raw);
+					
+					const body = response.body;
+					if(body === null){
+						row.find('.alert').show();
+					}
+					else{
+						bodyElement.shadowRoot.innerHTML = body;
+					}
+				})
 			})
 			// Handler for .ready() called.
 		});
 		</script>
-		<script src="/assets/js/html-email.js"></script>
 	</body>
 </html>

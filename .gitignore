@@ -49,9 +49,9 @@
 
 
 # Ignore custom global vhost gen templates
-/cfg/vhost-gen/apache22.conf
-/cfg/vhost-gen/apache24.conf
-/cfg/vhost-gen/nginx.conf
+/cfg/vhost-gen/apache22.yml
+/cfg/vhost-gen/apache24.yml
+/cfg/vhost-gen/nginx.yml
 
 # Ignore documentation sphinx build
 /docs/_build/
