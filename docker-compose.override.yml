@@ -16,8 +16,6 @@ services:
     restart: always
     volumes:
        - ~/sites:/shared/httpd
-  mysql:
-    profiles: ["disabled"]
   pgsql:
     profiles: ["disabled"]
   redis:
