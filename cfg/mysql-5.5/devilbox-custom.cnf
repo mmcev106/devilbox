@@ -1,3 +1,0 @@
-[mysqld]
-max_allowed_packet=16778240
-default_time_zone=America/Chicago

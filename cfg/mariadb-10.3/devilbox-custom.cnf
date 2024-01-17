@@ -1,0 +1,7 @@
+[mysqld]
+max_allowed_packet=16778240
+default_time_zone=America/Chicago
+
+#slow_query_log = 1 # required for show
+#slow-query_log_file = /var/log/mysql-slow.log
+#long_query_time = 999999
