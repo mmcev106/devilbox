@@ -340,7 +340,6 @@ services:
   mysql:
     image: devilbox/mysql:${MYSQL_SERVER}-0.21
     hostname: mysql
-    restart: always
 
     environment:
       - MYSQL_ROOT_PASSWORD
